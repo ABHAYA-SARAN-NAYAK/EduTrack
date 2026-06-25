@@ -3,7 +3,7 @@ import type { Role, Assignment, Subject, Student, SubmissionStatus } from '../ty
 import { SUBJECTS, STUDENTS, INITIAL_ASSIGNMENTS } from '../data/mockData';
 
 interface DataContextType {
-  role: Role;
+  role: Role | null;
   setRole: (role: Role) => void;
   students: Student[];
   subjects: Subject[];
@@ -23,9 +23,9 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 const SYSTEM_DATE = new Date('2026-06-25T18:36:55+05:30');
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRoleState] = useState<Role>(() => {
+  const [role, setRoleState] = useState<Role | null>(() => {
     const saved = localStorage.getItem('edutrack-role');
-    return (saved as Role) || 'faculty';
+    return (saved as Role) || null;
   });
 
   const [selectedStudentId, setSelectedStudentIdState] = useState<string>(() => {
@@ -47,7 +47,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Sync state changes to localStorage
   useEffect(() => {
-    localStorage.setItem('edutrack-role', role);
+    if (role) {
+      localStorage.setItem('edutrack-role', role);
+    }
   }, [role]);
 
   useEffect(() => {
